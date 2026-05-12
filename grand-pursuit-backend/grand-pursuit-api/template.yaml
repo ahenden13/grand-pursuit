@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+
+Resources:
+
+  GrandPursuitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: "'*'"
+
+  # ---------------- GET GAME STATE ----------------
+  GetGameStateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/
+      Handler: getGameState.handler
+      Runtime: nodejs20.x
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: GrandPursuitGameState
+      Events:
+        GetGameApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GrandPursuitApi
+            Path: /getGameState
+            Method: get
+
+  # ---------------- UPDATE GAME STATE ----------------
+  UpdateGameStateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/
+      Handler: updateGameState.handler
+      Runtime: nodejs20.x
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: GrandPursuitGameState
+      Events:
+        UpdateGameApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GrandPursuitApi
+            Path: /updateGameState
+            Method: post
+
+  # ---------------- RESET GAME ----------------
+  ResetGameFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/
+      Handler: resetGame.handler
+      Runtime: nodejs20.x
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: GrandPursuitGameState
+      Events:
+        ResetGameApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GrandPursuitApi
+            Path: /resetGame
+            Method: post
+
+Outputs:
+  ApiBaseUrl:
+    Description: API Gateway endpoint URL
+    Value:
+      Fn::Sub: https://${GrandPursuitApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/

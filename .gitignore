@@ -1,0 +1,21 @@
+# Node modules
+node_modules/
+
+# Vite build output
+dist/
+
+# AWS SAM build files
+.aws-sam/
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
+
+# VSCode settings
+.vscode/
